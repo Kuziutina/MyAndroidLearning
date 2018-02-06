@@ -12,7 +12,6 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     private static final String INDEX = "CURRENT_INDEX";
-    private static final String IS_SHOW = "IS_SHOW";
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -22,20 +21,18 @@ public class MainActivity extends AppCompatActivity {
     private TextView mQuestion;
     private Question[] questions;
     private int mCurrentIndex;
-    private boolean isShow;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putInt(INDEX, mCurrentIndex);
-        outState.putBoolean(IS_SHOW, isShow);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (intent == null) return;
-        isShow = intent.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWED, false);
+        questions[mCurrentIndex].setShowed(intent.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWED, false));
     }
 
 
@@ -46,11 +43,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(INDEX);
-            isShow = savedInstanceState.getBoolean(IS_SHOW, false);
         }
         else {
             mCurrentIndex = 0;
-            isShow = false;
         }
 
         mTrueButton = (Button)findViewById(R.id.true_button);
@@ -89,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, CheatActivity.class);
                 i.putExtra(CheatActivity.EXTRA_ANSWER_IS_TRUE, questions[mCurrentIndex].isAnswer());
+                i.putExtra(CheatActivity.EXTRA_ANSWER_SHOWED, questions[mCurrentIndex].isShowed());
                 startActivityForResult(i, 0);
             }
         });
@@ -97,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % questions.length;
-                isShow = false;
                 updateQuestion();
             }
         });
@@ -106,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mCurrentIndex = (questions.length + mCurrentIndex - 1) % questions.length;
-                isShow = false;
                 updateQuestion();
             }
         });
@@ -126,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkAnswer(boolean userAnswer) {
         int result;
-        if (isShow) {
+        if (questions[mCurrentIndex].isShowed()) {
             result = R.string.warning_toast;
         }
         else {

@@ -43,7 +43,7 @@ public class CheatActivity extends AppCompatActivity {
             }
         }
         else {
-            isShow = false;
+            isShow = getIntent().getBooleanExtra(EXTRA_ANSWER_SHOWED,false);
             mAnswer = getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TRUE, true);
         }
 
